@@ -387,8 +387,8 @@ public
         }
 
         // Place the stream ending
-        encodedBuffer.fill(7);
-        encodedBuffer.fill(1, 0x01);
+        encodedBuffer.fill0(7);
+        encodedBuffer.write(cast(ubyte)1);
 
         return encodedBuffer.toBytes;
     }
