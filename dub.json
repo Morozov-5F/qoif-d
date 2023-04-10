@@ -1,0 +1,7 @@
+{
+	"name": "qoif-d",
+	"description": "Quite OK Image Format library written in D",
+	"targetType": "library",
+	"authors": [ "Morozov-5F" ],
+	"license": "BSD 3-clause"
+}

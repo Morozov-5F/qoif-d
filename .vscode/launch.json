@@ -1,0 +1,22 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "code-d",
+            "request": "launch",
+            "name": "Debug D project",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/.dub/build/qoif-d-test-library-unittest-windows-x86_64-dmd_v2.101.2-dirty-6AFF4FD715BFC96F1B7476EF8658395E56A8260016434A20B50DBEF1E9F0AC21/qoif-d-test-library.exe"
+        },
+        {
+            "type": "code-d",
+            "request": "launch",
+            "name": "Debug D project (DMD)",
+            "cwd": "${command:dubWorkingDirectory}",
+            "program": "${command:dubTarget}"
+        }
+    ]
+}
