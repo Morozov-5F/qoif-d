@@ -554,12 +554,25 @@ public
         return new QoifImage(*header, image);
     }
 
+    /// Encode and decode RGB image
     unittest
     {
         import std.file : read;
 
         // Test RGB image decode and encode
         auto originalImage = cast(ubyte[]) read("test_data/testcard.qoi");
+        QoifImage decoded = decode(originalImage);
+        auto encodedImage = encode(decoded.data, decoded.header.width, decoded.header.height, decoded.header.channels, decoded
+                .header.colorspace);
+        assert(originalImage == encodedImage);
+    }
+
+    unittest
+    {
+        import std.file : read;
+
+        // Test RGBA image decode and encode
+        auto originalImage = cast(ubyte[]) read("test_data/testcard_rgba.qoi");
         QoifImage decoded = decode(originalImage);
         auto encodedImage = encode(decoded.data, decoded.header.width, decoded.header.height, decoded.header.channels, decoded
                 .header.colorspace);
