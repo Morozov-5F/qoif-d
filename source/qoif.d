@@ -31,8 +31,8 @@ private
             return bigEndianToNative!uint(rawHeight);
         }
 
-        this(uint width, uint height, QoifChannels channels = QoifChannels.RGB, QoifColorSpace colorspace = QoifColorSpace
-                .sRGB)
+        this(uint width, uint height, QoifChannels channels = QoifChannels.RGB,
+            QoifColorSpace colorspace = QoifColorSpace.sRGB)
         {
             assert(colorspace == QoifColorSpace.sRGB);
 
@@ -116,10 +116,7 @@ private
 
     struct QoifEntryIndex
     {
-        mixin(bitfields!(
-                ubyte, "index", 6,
-                QoifTag2Bit, "type", 2,
-        ));
+        mixin(bitfields!(ubyte, "index", 6, QoifTag2Bit, "type", 2,));
 
         this(size_t index)
         {
@@ -138,12 +135,7 @@ private
 
     struct QoifEntryDiff
     {
-        mixin(bitfields!(
-                ubyte, "db", 2,
-                ubyte, "dg", 2,
-                ubyte, "dr", 2,
-                QoifTag2Bit, "type", 2,
-        ));
+        mixin(bitfields!(ubyte, "db", 2, ubyte, "dg", 2, ubyte, "dr", 2, QoifTag2Bit, "type", 2,));
 
         this(byte dr, byte dg, byte db)
         {
@@ -167,12 +159,8 @@ private
 
     struct QoifEntryLuma
     {
-        mixin(bitfields!(
-                ubyte, "diffGreen", 6,
-                QoifTag2Bit, "type", 2,
-                ubyte, "db_dg", 4,
-                ubyte, "dr_dg", 4,
-        ));
+        mixin(bitfields!(ubyte, "diffGreen", 6, QoifTag2Bit, "type", 2, ubyte,
+                "db_dg", 4, ubyte, "dr_dg", 4,));
 
         this(byte diffGreen, byte dr_dg, byte db_dg)
         {
@@ -196,10 +184,7 @@ private
 
     struct QoifEntryRun
     {
-        mixin(bitfields!(
-                ubyte, "run", 6,
-                QoifTag2Bit, "type", 2,
-        ));
+        mixin(bitfields!(ubyte, "run", 6, QoifTag2Bit, "type", 2,));
 
         this(size_t repeatingPixels)
         {
@@ -238,8 +223,8 @@ private
 
         QoifPixelDiff opBinary(string op : "-")(const QoifPixel other) const
         {
-            return QoifPixelDiff(cast(byte)(r - other.r), cast(byte)(g - other.g),
-                cast(byte)(b - other.b), cast(byte)(a - other.a));
+            return QoifPixelDiff(cast(byte)(r - other.r),
+                cast(byte)(g - other.g), cast(byte)(b - other.b), cast(byte)(a - other.a));
         }
 
         alias toPixel this;
@@ -269,7 +254,8 @@ private
         bool isWithingQoifLumaDiff()
         {
             // TODO: Check if da == 0?
-            return (-32 <= dg && dg <= 31) && (-8 <= dr_dg && dr_dg <= 7) && (-8 <= db_dg && db_dg <= 7);
+            return (-32 <= dg && dg <= 31) && (-8 <= dr_dg && dr_dg <= 7)
+                && (-8 <= db_dg && db_dg <= 7);
         }
     }
 
@@ -323,14 +309,14 @@ public
         }
     }
 
-    ubyte[] encode(uint[] pixels, int width, int height, QoifChannels channels = QoifChannels.RGB, QoifColorSpace colorSpace = QoifColorSpace
-        .sRGB)
+    ubyte[] encode(uint[] pixels, int width, int height,
+        QoifChannels channels = QoifChannels.RGB, QoifColorSpace colorSpace = QoifColorSpace.sRGB)
     {
         return encode(pixels, width, height, channels, colorSpace);
     }
 
-    ubyte[] encode(Pixel[] pixels, int width, int height, QoifChannels channels = QoifChannels.RGB, QoifColorSpace colorSpace = QoifColorSpace
-        .sRGB)
+    ubyte[] encode(Pixel[] pixels, int width, int height,
+        QoifChannels channels = QoifChannels.RGB, QoifColorSpace colorSpace = QoifColorSpace.sRGB)
     {
         import std.outbuffer;
 
@@ -425,7 +411,10 @@ public
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x01
         ];
 
-        auto image = [ Pixel(255, 0, 0), Pixel(0, 255, 0), Pixel(0, 0, 255), Pixel(255, 255, 255)];
+        auto image = [
+            Pixel(255, 0, 0), Pixel(0, 255, 0), Pixel(0, 0, 255),
+            Pixel(255, 255, 255)
+        ];
 
         auto actualData = encode(image, 2, 2);
         assert(actualData == expectedData);
@@ -443,7 +432,7 @@ public
             ubyte[] expectedData;
         }
 
-// dfmt off
+        // dfmt off
         TestData[] testData = [
             {"Single color", Pixel(23, 128, 54), QoifChannels.RGB, [ 0xFE, 23, 128, 54 ] },
             {"Single color with alpha", Pixel(23, 128, 54, 128), QoifChannels.RGBA, [ 0xFF, 23, 128, 54, 128 ] },
@@ -451,13 +440,17 @@ public
             {"Delta-encoded color", Pixel(255, 255, 255), QoifChannels.RGB, [ 0b01010101 ] },
             {"Enhanced delta-encoded color", Pixel(2, 10, 17), QoifChannels.RGB, [ 0b10101010, 0b00001111 ] },
         ];
-// dfmt on
+        // dfmt on
 
         foreach (t; testData)
         {
-            ubyte[] expectedData = cast(ubyte[])[ 'q', 'o', 'i', 'f', 0, 0, 0, 1, 0, 0, 0, 1, t.imageChannels, 0 ] ~ t.expectedData ~ cast(ubyte[])[ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x01 ];
+            ubyte[] expectedData = cast(ubyte[])[
+                'q', 'o', 'i', 'f', 0, 0, 0, 1, 0, 0, 0, 1, t.imageChannels, 0
+            ] ~ t.expectedData ~ cast(ubyte[])[
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x01
+            ];
 
-            auto actualData = encode([ t.image ], 1, 1, t.imageChannels);
+            auto actualData = encode([t.image], 1, 1, t.imageChannels);
             assert(actualData == expectedData, t.caseName ~ " failed");
         }
     }
@@ -493,7 +486,8 @@ public
             {
                 auto entry = cast(QoifEntryRGB*)&data[offset];
                 offsetChange = (*entry).sizeof;
-                image[pixelsProcessed] = Pixel(entry.red, entry.green, entry.blue, previousPixel.a);
+                image[pixelsProcessed] = Pixel(entry.red, entry.green,
+                    entry.blue, previousPixel.a);
             }
             else if (data[offset] == QOIFTag8Bit.QOI_OP_RGBA)
             {
@@ -545,7 +539,8 @@ public
             }
             previousPixel = image[pixelsProcessed];
             int indexPosition = (
-                previousPixel.r * 3 + previousPixel.g * 5 + previousPixel.b * 7 + previousPixel.a * 11) % 64;
+                previousPixel.r * 3 + previousPixel.g * 5 + previousPixel.b * 7
+                    + previousPixel.a * 11) % 64;
             previouslySeenPixels[indexPosition] = previousPixel;
 
             offset += offsetChange;
@@ -562,8 +557,8 @@ public
         // Test RGB image decode and encode
         auto originalImage = cast(ubyte[]) read("test_data/testcard.qoi");
         QoifImage decoded = decode(originalImage);
-        auto encodedImage = encode(decoded.data, decoded.header.width, decoded.header.height, decoded.header.channels, decoded
-                .header.colorspace);
+        auto encodedImage = encode(decoded.data, decoded.header.width,
+            decoded.header.height, decoded.header.channels, decoded.header.colorspace);
         assert(originalImage == encodedImage);
     }
 
@@ -574,8 +569,8 @@ public
         // Test RGBA image decode and encode
         auto originalImage = cast(ubyte[]) read("test_data/testcard_rgba.qoi");
         QoifImage decoded = decode(originalImage);
-        auto encodedImage = encode(decoded.data, decoded.header.width, decoded.header.height, decoded.header.channels, decoded
-                .header.colorspace);
+        auto encodedImage = encode(decoded.data, decoded.header.width,
+            decoded.header.height, decoded.header.channels, decoded.header.colorspace);
         assert(originalImage == encodedImage);
     }
 }
