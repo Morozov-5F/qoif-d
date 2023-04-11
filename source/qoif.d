@@ -31,8 +31,8 @@ private
             return bigEndianToNative!uint(rawHeight);
         }
 
-        this(uint width, uint height, QoifChannels channels = QoifChannels.RGB,
-            QoifColorSpace colorspace = QoifColorSpace.sRGB) @safe
+        this(uint width, uint height, QoifChannels channels = QoifChannels.RGB, QoifColorSpace colorspace = QoifColorSpace
+                .sRGB) @safe
         {
             assert(colorspace == QoifColorSpace.sRGB);
 
@@ -159,8 +159,7 @@ private
 
     struct QoifEntryLuma
     {
-        mixin(bitfields!(ubyte, "diffGreen", 6, QoifTag2Bit, "type", 2, ubyte,
-                "db_dg", 4, ubyte, "dr_dg", 4,));
+        mixin(bitfields!(ubyte, "diffGreen", 6, QoifTag2Bit, "type", 2, ubyte, "db_dg", 4, ubyte, "dr_dg", 4,));
 
         this(byte diffGreen, byte dr_dg, byte db_dg) @safe
         {
@@ -223,8 +222,8 @@ private
 
         QoifPixelDiff opBinary(string op : "-")(const QoifPixel other) const @safe
         {
-            return QoifPixelDiff(cast(byte)(r - other.r),
-                cast(byte)(g - other.g), cast(byte)(b - other.b), cast(byte)(a - other.a));
+            return QoifPixelDiff(cast(byte)(r - other.r), cast(byte)(g - other.g), cast(byte)(b - other.b), cast(byte)(a - other
+                    .a));
         }
 
         alias toPixel this;
@@ -254,8 +253,7 @@ private
         bool isWithingQoifLumaDiff() @safe
         {
             // TODO: Check if da == 0?
-            return (-32 <= dg && dg <= 31) && (-8 <= dr_dg && dr_dg <= 7)
-                && (-8 <= db_dg && db_dg <= 7);
+            return (-32 <= dg && dg <= 31) && (-8 <= dr_dg && dr_dg <= 7) && (-8 <= db_dg && db_dg <= 7);
         }
     }
 
@@ -322,14 +320,14 @@ public
         }
     }
 
-    ubyte[] encode(uint[] pixels, int width, int height,
-        QoifChannels channels = QoifChannels.RGB, QoifColorSpace colorSpace = QoifColorSpace.sRGB) @safe
+    ubyte[] encode(uint[] pixels, int width, int height, QoifChannels channels = QoifChannels.RGB,
+            QoifColorSpace colorSpace = QoifColorSpace.sRGB) @safe
     {
         return encode(pixels, width, height, channels, colorSpace);
     }
 
-    ubyte[] encode(Pixel[] pixels, int width, int height,
-        QoifChannels channels = QoifChannels.RGB, QoifColorSpace colorSpace = QoifColorSpace.sRGB) @safe
+    ubyte[] encode(Pixel[] pixels, int width, int height, QoifChannels channels = QoifChannels.RGB,
+            QoifColorSpace colorSpace = QoifColorSpace.sRGB) @safe
     {
         import std.outbuffer;
 
@@ -346,8 +344,7 @@ public
         while (currentPixelIndex < pixels.length)
         {
             auto currentPixel = QoifPixel(pixels[currentPixelIndex]);
-            int indexPosition = (
-                currentPixel.r * 3 + currentPixel.g * 5 + currentPixel.b * 7 + currentPixel.a * 11) % 64;
+            int indexPosition = (currentPixel.r * 3 + currentPixel.g * 5 + currentPixel.b * 7 + currentPixel.a * 11) % 64;
             QoifPixelDiff diff = currentPixel - previousPixel;
 
             // 1. Check if we already seen the pixel
@@ -401,7 +398,7 @@ public
 
         // Place the stream ending
         encodedBuffer.fill0(7);
-        encodedBuffer.write(cast(ubyte)1);
+        encodedBuffer.write(cast(ubyte) 1);
 
         return encodedBuffer.toBytes;
     }
@@ -424,10 +421,7 @@ public
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x01
         ];
 
-        auto image = [
-            Pixel(255, 0, 0), Pixel(0, 255, 0), Pixel(0, 0, 255),
-            Pixel(255, 255, 255)
-        ];
+        auto image = [Pixel(255, 0, 0), Pixel(0, 255, 0), Pixel(0, 0, 255), Pixel(255, 255, 255)];
 
         auto actualData = encode(image, 2, 2);
         assert(actualData == expectedData);
@@ -457,11 +451,8 @@ public
 
         foreach (t; testData)
         {
-            ubyte[] expectedData = cast(ubyte[])[
-                'q', 'o', 'i', 'f', 0, 0, 0, 1, 0, 0, 0, 1, t.imageChannels, 0
-            ] ~ t.expectedData ~ cast(ubyte[])[
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x01
-            ];
+            ubyte[] expectedData = cast(ubyte[])['q', 'o', 'i', 'f', 0, 0, 0, 1, 0, 0, 0, 1, t.imageChannels, 0]
+                ~ t.expectedData ~ cast(ubyte[])[0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x01];
 
             auto actualData = encode([t.image], 1, 1, t.imageChannels);
             assert(actualData == expectedData, t.caseName ~ " failed");
@@ -491,8 +482,7 @@ public
             {
                 auto entry = cast(QoifEntryRGB*)&data[offset];
                 offsetChange = (*entry).sizeof;
-                image[pixelsProcessed] = Pixel(entry.red, entry.green,
-                    entry.blue, previousPixel.a);
+                image[pixelsProcessed] = Pixel(entry.red, entry.green, entry.blue, previousPixel.a);
             }
             else if (data[offset] == QOIFTag8Bit.QOI_OP_RGBA)
             {
@@ -543,9 +533,7 @@ public
                 }
             }
             previousPixel = image[pixelsProcessed];
-            int indexPosition = (
-                previousPixel.r * 3 + previousPixel.g * 5 + previousPixel.b * 7
-                    + previousPixel.a * 11) % 64;
+            int indexPosition = (previousPixel.r * 3 + previousPixel.g * 5 + previousPixel.b * 7 + previousPixel.a * 11) % 64;
             previouslySeenPixels[indexPosition] = previousPixel;
 
             offset += offsetChange;
@@ -554,30 +542,57 @@ public
         return new QoifImage(*header, image);
     }
 
+    /// This test verifies that basic 2x2 single color image is encoded properly
+    @safe private unittest
+    {
+        // Test image:
+        // |---|---|
+        // | R | G |
+        // |---|---|
+        // | B | W |
+        // |---|---|
+        ubyte[] expectedData = [
+            // Header
+            'q', 'o', 'i', 'f', 0, 0, 0, 2, 0, 0, 0, 2, 3, 0,
+            // Data
+            0b01011010, 0b01110110, 0b01101101, 0b01010110,
+            // Footer
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0, 0x01
+        ];
+
+        auto expecteImage = [Pixel(255, 0, 0), Pixel(0, 255, 0), Pixel(0, 0, 255), Pixel(255, 255, 255)];
+
+        auto actualImage = decode(expectedData);
+        assert(actualImage.width == 2, "image width is incorrect");
+        assert(actualImage.height == 2, "image height is incorrect");
+        assert(actualImage.channels == QoifChannels.RGB, "image channels is incorrect");
+        assert(actualImage.colorSpace == QoifColorSpace.sRGB, "image color space is incorrect");
+
+        assert(actualImage.data == expecteImage);
+    }
+
     /// Encode and decode RGB image
-    @safe unittest
+    unittest
     {
         import std.file : read;
 
-        auto originalImage = cast(ubyte[]) read("test_data/testcard.qoi");
+        auto originalImage = cast(ubyte[]) read("test_data/kodim10.qoi");
         QoifImage decoded = decode(originalImage);
-        assert(decoded.channels = QoifChannels.RGB);
-        assert(decoded.colorSpace = QoifColorSpace.sRGB);
+        assert(decoded.channels == QoifChannels.RGB);
+        assert(decoded.colorSpace == QoifColorSpace.sRGB);
 
-        auto encodedImage = encode(decoded.data, decoded.header.width,
-            decoded.header.height, decoded.header.channels, decoded.header.colorspace);
+        auto encodedImage = encode(decoded.data, decoded.width, decoded.height, decoded.channels, decoded.colorSpace);
         assert(originalImage == encodedImage);
     }
 
-    @safe unittest
+    unittest
     {
         import std.file : read;
 
         // Test RGBA image decode and encode
         auto originalImage = cast(ubyte[]) read("test_data/testcard_rgba.qoi");
         QoifImage decoded = decode(originalImage);
-        auto encodedImage = encode(decoded.data, decoded.header.width,
-            decoded.header.height, decoded.header.channels, decoded.header.colorspace);
+        auto encodedImage = encode(decoded.data, decoded.width, decoded.height, decoded.channels, decoded.colorSpace);
         assert(originalImage == encodedImage);
     }
 }
