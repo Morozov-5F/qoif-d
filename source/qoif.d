@@ -21,18 +21,18 @@ private
         QoifChannels channels;
         QoifColorSpace colorspace;
 
-        uint width()
+        uint width() @safe
         {
             return bigEndianToNative!uint(rawWidth);
         }
 
-        uint height()
+        uint height() @safe
         {
             return bigEndianToNative!uint(rawHeight);
         }
 
         this(uint width, uint height, QoifChannels channels = QoifChannels.RGB,
-            QoifColorSpace colorspace = QoifColorSpace.sRGB)
+            QoifColorSpace colorspace = QoifColorSpace.sRGB) @safe
         {
             assert(colorspace == QoifColorSpace.sRGB);
 
@@ -69,20 +69,20 @@ private
         const QOIFTag8Bit tag = QOIFTag8Bit.QOI_OP_RGB;
         ubyte red, green, blue;
 
-        this(ubyte r, ubyte g, ubyte b)
+        this(ubyte r, ubyte g, ubyte b) @safe
         {
             red = r;
             green = g;
             blue = b;
         }
 
-        unittest
+        @safe unittest
         {
             auto testEntry = QoifEntryRGB(52, 34, 102);
             assert(toByteArray(testEntry) == [0xFE, 52, 34, 102]);
         }
 
-        this(const ref QoifPixel pixel)
+        this(const ref QoifPixel pixel) @safe
         {
             this(pixel.r, pixel.g, pixel.b);
         }
@@ -94,7 +94,7 @@ private
         const QOIFTag8Bit tag = QOIFTag8Bit.QOI_OP_RGBA;
         ubyte red, green, blue, alpha;
 
-        this(ubyte r, ubyte g, ubyte b, ubyte a)
+        this(ubyte r, ubyte g, ubyte b, ubyte a) @safe
         {
             red = r;
             green = g;
@@ -102,13 +102,13 @@ private
             alpha = a;
         }
 
-        unittest
+        @safe unittest
         {
             auto testEntry = QoifEntryRGBA(52, 34, 102, 100);
             assert(toByteArray(testEntry) == [0xFF, 52, 34, 102, 100]);
         }
 
-        this(const ref QoifPixel pixel)
+        this(const ref QoifPixel pixel) @safe
         {
             this(pixel.r, pixel.g, pixel.b, pixel.a);
         }
@@ -118,7 +118,7 @@ private
     {
         mixin(bitfields!(ubyte, "index", 6, QoifTag2Bit, "type", 2,));
 
-        this(size_t index)
+        this(size_t index) @safe
         {
             assert(index < 64);
 
@@ -126,7 +126,7 @@ private
             this.index = cast(ubyte) index;
         }
 
-        unittest
+        @safe unittest
         {
             auto testEntry = QoifEntryIndex(62);
             assert(toByteArray(testEntry) == [0b00111110]);
@@ -137,7 +137,7 @@ private
     {
         mixin(bitfields!(ubyte, "db", 2, ubyte, "dg", 2, ubyte, "dr", 2, QoifTag2Bit, "type", 2,));
 
-        this(byte dr, byte dg, byte db)
+        this(byte dr, byte dg, byte db) @safe
         {
             type = QoifTag2Bit.QOI_OP_DIFF;
             this.db = cast(ubyte)(db + 2);
@@ -145,13 +145,13 @@ private
             this.dr = cast(ubyte)(dr + 2);
         }
 
-        unittest
+        @safe unittest
         {
             auto testEntry = QoifEntryDiff(-2, 0, 1);
             assert(toByteArray(testEntry) == [0b01001011]);
         }
 
-        this(const ref QoifPixelDiff pixelDiff)
+        this(const ref QoifPixelDiff pixelDiff) @safe
         {
             this(pixelDiff.dr, pixelDiff.dg, pixelDiff.db);
         }
@@ -162,7 +162,7 @@ private
         mixin(bitfields!(ubyte, "diffGreen", 6, QoifTag2Bit, "type", 2, ubyte,
                 "db_dg", 4, ubyte, "dr_dg", 4,));
 
-        this(byte diffGreen, byte dr_dg, byte db_dg)
+        this(byte diffGreen, byte dr_dg, byte db_dg) @safe
         {
             type = QoifTag2Bit.QOI_OP_LUMA;
             this.diffGreen = cast(ubyte)(diffGreen + 32);
@@ -170,13 +170,13 @@ private
             this.dr_dg = cast(ubyte)(dr_dg + 8);
         }
 
-        unittest
+        @safe unittest
         {
             auto testEntry = QoifEntryLuma(-15, 0, 4);
             assert(toByteArray(testEntry) == [0b10010001, 0b10001100]);
         }
 
-        this(const ref QoifPixelDiff pixelDiff)
+        this(const ref QoifPixelDiff pixelDiff) @safe
         {
             this(pixelDiff.dg, pixelDiff.dr_dg, pixelDiff.db_dg);
         }
@@ -186,13 +186,13 @@ private
     {
         mixin(bitfields!(ubyte, "run", 6, QoifTag2Bit, "type", 2,));
 
-        this(size_t repeatingPixels)
+        this(size_t repeatingPixels) @safe
         {
             type = QoifTag2Bit.QOI_OP_RUN;
             this.run = cast(ubyte)(repeatingPixels - 1);
         }
 
-        unittest
+        @safe unittest
         {
             auto testEntry = QoifEntryRun(35);
             assert(toByteArray(testEntry) == [0b11100010]);
@@ -203,7 +203,7 @@ private
     {
         ubyte r, g, b, a = 255;
 
-        this(ubyte r, ubyte g, ubyte b, ubyte a)
+        this(ubyte r, ubyte g, ubyte b, ubyte a) @safe
         {
             this.r = r;
             this.g = g;
@@ -211,17 +211,17 @@ private
             this.a = a;
         }
 
-        this(Pixel pixel)
+        this(Pixel pixel) @safe
         {
             this(pixel.r, pixel.g, pixel.b, pixel.a);
         }
 
-        Pixel toPixel()
+        Pixel toPixel() @safe
         {
             return Pixel(r, g, b, a);
         }
 
-        QoifPixelDiff opBinary(string op : "-")(const QoifPixel other) const
+        QoifPixelDiff opBinary(string op : "-")(const QoifPixel other) const @safe
         {
             return QoifPixelDiff(cast(byte)(r - other.r),
                 cast(byte)(g - other.g), cast(byte)(b - other.b), cast(byte)(a - other.a));
@@ -234,7 +234,7 @@ private
     {
         byte dr, dg, db, da, dr_dg, db_dg;
 
-        this(int dr, int dg, int db, int da = 0)
+        this(int dr, int dg, int db, int da = 0) @safe
         {
             this.dr = cast(byte) dr;
             this.dg = cast(byte) dg;
@@ -245,13 +245,13 @@ private
             db_dg = cast(byte)(this.db - this.dg);
         }
 
-        bool isWithinQoifDiff()
+        bool isWithinQoifDiff() @safe
         {
             // TODO: Check if da == 0?
             return (-2 <= dr && dr <= 1) && (-2 <= dg && dg <= 1) && (-2 <= db && db <= 1);
         }
 
-        bool isWithingQoifLumaDiff()
+        bool isWithingQoifLumaDiff() @safe
         {
             // TODO: Check if da == 0?
             return (-32 <= dg && dg <= 31) && (-8 <= dr_dg && dr_dg <= 7)
@@ -259,7 +259,7 @@ private
         }
     }
 
-    ubyte[] toByteArray(T)(inout T t)
+    @trusted ubyte[] toByteArray(T)(inout T t)
     {
         return (cast(ubyte*)&t)[0 .. T.sizeof].dup;
     }
@@ -281,13 +281,26 @@ public
 
     class QoifImage
     {
-        QoifHeader header;
+        uint width;
+        uint height;
+
+        QoifChannels channels;
+        QoifColorSpace colorSpace;
+
         Pixel[] data;
 
-        this(QoifHeader header, Pixel[] data)
+        this(Pixel[] data, uint width, uint height, QoifChannels channels, QoifColorSpace colorSpace) @safe
         {
-            this.header = header;
             this.data = data;
+            this.width = width;
+            this.height = height;
+            this.channels = channels;
+            this.colorSpace = colorSpace;
+        }
+
+        private this(QoifHeader header, Pixel[] data) @safe
+        {
+            this(data, header.width, header.height, header.channels, header.colorspace);
         }
     }
 
@@ -300,7 +313,7 @@ public
 
         uint raw;
 
-        this(ubyte r, ubyte g, ubyte b, ubyte a = 255)
+        this(ubyte r, ubyte g, ubyte b, ubyte a = 255) @safe
         {
             this.r = r;
             this.g = g;
@@ -310,13 +323,13 @@ public
     }
 
     ubyte[] encode(uint[] pixels, int width, int height,
-        QoifChannels channels = QoifChannels.RGB, QoifColorSpace colorSpace = QoifColorSpace.sRGB)
+        QoifChannels channels = QoifChannels.RGB, QoifColorSpace colorSpace = QoifColorSpace.sRGB) @safe
     {
         return encode(pixels, width, height, channels, colorSpace);
     }
 
     ubyte[] encode(Pixel[] pixels, int width, int height,
-        QoifChannels channels = QoifChannels.RGB, QoifColorSpace colorSpace = QoifColorSpace.sRGB)
+        QoifChannels channels = QoifChannels.RGB, QoifColorSpace colorSpace = QoifColorSpace.sRGB) @safe
     {
         import std.outbuffer;
 
@@ -394,7 +407,7 @@ public
     }
 
     /// This test verifies that basic 2x2 single color image is encoded properly
-    private unittest
+    @safe private unittest
     {
         // Test image:
         // |---|---|
@@ -421,7 +434,7 @@ public
     }
 
     /// This test verifies that encoder is capable of encoding all the QOIF types
-    private unittest
+    @safe private unittest
     {
         // All of the cases here a 1x1 images just to verify basic types
         struct TestData
@@ -455,15 +468,7 @@ public
         }
     }
 
-    unittest
-    {
-        // This test verifies encoding two and more subsequent items in relation:
-        // 1. RGB -> Pixel run
-        // 2. RGB -> Diff
-        // 3.
-    }
-
-    QoifImage decode(const ubyte[] data)
+    QoifImage decode(const ubyte[] data) @trusted
     {
         auto header = cast(QoifHeader*) data;
 
@@ -550,19 +555,21 @@ public
     }
 
     /// Encode and decode RGB image
-    unittest
+    @safe unittest
     {
         import std.file : read;
 
-        // Test RGB image decode and encode
         auto originalImage = cast(ubyte[]) read("test_data/testcard.qoi");
         QoifImage decoded = decode(originalImage);
+        assert(decoded.channels = QoifChannels.RGB);
+        assert(decoded.colorSpace = QoifColorSpace.sRGB);
+
         auto encodedImage = encode(decoded.data, decoded.header.width,
             decoded.header.height, decoded.header.channels, decoded.header.colorspace);
         assert(originalImage == encodedImage);
     }
 
-    unittest
+    @safe unittest
     {
         import std.file : read;
 
